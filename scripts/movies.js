@@ -17,50 +17,67 @@
 //     },delay)
 //  }
 
-let moviesbox=document.getElementById("movies");
- async function main()
+let movies_div = document.getElementById("movies");
+ async function searchMOvies()
 {
     try{
-        const value=document.getElementById("search").value;
-        const res=await fetch( `http://www.omdbapi.com/?i=tt3896198&apikey=8f76a238&s=${value}`)
+        const query=document.getElementById("search").value;
+        const res=await fetch( `http://www.omdbapi.com/?i=tt3896198&apikey=8f76a238&s=${query}`)
         const  data = await res.json();
-        console.log(data);
+        var searchData = localStorage.setItem("SearchMovies",JSON.stringify(data))
+        window.location.reload();
         const movies =data.Search
-        append(movies)
+        return movies
+        // append(movies)
     
     }catch(err){
         console.log(err)
     }
 }
+let movie_data= JSON.parse(localStorage.getItem("SearchMovies"))||[];
+console.log(movie_data)
 
-function append(movies){
-    console.log(movies)
-   for(var i=0;i<movies.length;i++){
+ let x = movie_data.Search;
+x.map(function(el){
+     //console.log(el);
+ //     window.location.reload();
+     let box1= document.createElement("div");
+     let poster=document.createElement("img");
+     poster.src=el.Poster;
+     let name = document.createElement("p");
+     name.innerText=el.Title; 
+     let Price = document.createElement("h4")
+     Price.innerText="₹ 100/"
+     Price.setAttribute("class","price")
+     let btn = document.createElement("button");
+     btn.innerText="Book Now";
+     btn.setAttribute("class","book_now");
+     
+     box1.append(poster,name,Price,btn)
+     
+     document.getElementById("movies").append(box1);
+     btn.addEventListener("click",function(){
+        addToCart(el);
 
-    let box= document.createElement("div")
-    let ima=document.getElementById("img")
-    ima.src=el.Poster
-    let name=document.createElement("p")
-    name.innerText=el.Title
-
-    let button=document.createElement("button")
-    button.ClassName="book_now"
-    button.innerText="Book Now"
-    button.onclick=()=>{
-        mov(el)
-    }
-    box.append(ima,name,button);
-
-    moviesbox.append(box)
-
-   }
-       
-   
-
-}
-function mov(el){
+  
+  })
+});
+let cartData=[];
+function   addToCart(el){
+    cartData.push(el);
+    localStorage.setItem("movie",JSON.stringify(cartData));
     window.location.href="/checkout.html"
 
+}
+
+async function main()
+{
+     let data = await searchMOvies();
+     if(data == undefined)
+     {
+          return false;
+     }
+   ;
 }
 
 function debounce (func, delay){
